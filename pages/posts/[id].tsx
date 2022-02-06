@@ -68,6 +68,7 @@ export default function Post({
 	const [showCommentBtnPos, setShowCommentBtnPos] = useState<DOMRect | null>();
 	const [commentObj, setCommentObj] = useState(RESET_COMMENT);
 	const [allComments, setAllComments] = useState([]);
+	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
 		setAllComments(attachComments(comments));
@@ -105,32 +106,36 @@ export default function Post({
 	const handleNewComment = async (e) => {
 		e.preventDefault();
 
-		if (!auth.currentUser?.uid) {
-			alert("Need to login to comment yo!");
-			return;
-		}
+		if (!auth.currentUser?.uid) return;
 
-		let postRef = doc(store, "posts", postData.id);
-		let commentsRef = collection(postRef, "comments");
-		await updatePost(postData.id);
+		setIsLoading(true);
 
-		const newComment = {
-			date: Timestamp.now(),
-			...commentObj,
-		};
-		const commRef = await addDoc(commentsRef, newComment);
+		try {
+			let postRef = doc(store, "posts", postData.id);
+			let commentsRef = collection(postRef, "comments");
+			await updatePost(postData.id);
 
-		if (commRef.id) {
-			setCommentObj(RESET_COMMENT);
-			setAllComments((prevComms) => [
-				...prevComms,
-				{
-					...newComment,
-					rect: { top: scrollYOffset() + showCommentBtnPos.top },
-				},
-			]);
-			setShowCommentForm(false);
-			setShowCommentBtn(false);
+			const newComment = {
+				date: Timestamp.now(),
+				...commentObj,
+			};
+			const commRef = await addDoc(commentsRef, newComment);
+
+			if (commRef.id) {
+				setCommentObj(RESET_COMMENT);
+				setAllComments((prevComms) => [
+					...prevComms,
+					{
+						...newComment,
+						rect: { top: scrollYOffset() + showCommentBtnPos.top },
+					},
+				]);
+				setShowCommentForm(false);
+				setShowCommentBtn(false);
+			}
+		} catch (e) {
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -158,8 +163,9 @@ export default function Post({
 								left: showCommentBtnPos.left + 20,
 							}}
 							onClick={() => setShowCommentForm(true)}
+							disabled={!auth.currentUser?.uid}
 						>
-							comment
+							{!auth.currentUser?.uid ? "login to " : ""} comment
 						</button>
 					)}
 				</article>
@@ -183,7 +189,9 @@ export default function Post({
 									setCommentObj((c) => ({ ...c, comment: target.value }))
 								}
 							/>
-							<button type="submit">save</button>
+							<button type="submit" disabled={!auth.currentUser?.uid}>
+								{isLoading ? "saving..." : "save"}
+							</button>
 						</form>
 					)}
 				</aside>
