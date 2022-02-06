@@ -12,12 +12,7 @@ import {
 } from "firebase/firestore";
 import { auth, store } from "../../firebase/config";
 import { useEffect, useState } from "react";
-
-type SelectionState = {
-	text: string;
-	selection: Selection;
-	range: Range;
-};
+import { useAuth } from "../../hooks/useAuth";
 
 type Comment = {
 	text: string;
@@ -63,6 +58,8 @@ export default function Post({
 	};
 	comments: Comment[];
 }) {
+	const { activeUser } = useAuth();
+
 	const [showCommentBtn, setShowCommentBtn] = useState(false);
 	const [showCommentForm, setShowCommentForm] = useState(false);
 	const [showCommentBtnPos, setShowCommentBtnPos] = useState<DOMRect | null>();
@@ -106,7 +103,7 @@ export default function Post({
 	const handleNewComment = async (e) => {
 		e.preventDefault();
 
-		if (!auth.currentUser?.uid) return;
+		if (!activeUser?.uid) return;
 
 		setIsLoading(true);
 
@@ -163,9 +160,9 @@ export default function Post({
 								left: showCommentBtnPos.left + 20,
 							}}
 							onClick={() => setShowCommentForm(true)}
-							disabled={!auth.currentUser?.uid}
+							disabled={!activeUser?.uid}
 						>
-							{!auth.currentUser?.uid ? "login to " : ""} comment
+							{!activeUser?.uid ? "login to " : ""} comment
 						</button>
 					)}
 				</article>
@@ -189,7 +186,7 @@ export default function Post({
 									setCommentObj((c) => ({ ...c, comment: target.value }))
 								}
 							/>
-							<button type="submit" disabled={!auth.currentUser?.uid}>
+							<button type="submit" disabled={!activeUser?.uid}>
 								{isLoading ? "saving..." : "save"}
 							</button>
 						</form>

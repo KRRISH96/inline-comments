@@ -1,17 +1,8 @@
 import Head from "next/head";
-import Image from "next/image";
 import Link from "next/link";
-import {
-	signOut,
-	signInWithPopup,
-	GoogleAuthProvider,
-	onAuthStateChanged,
-} from "firebase/auth";
 import styles from "./layout.module.css";
 import utilStyles from "../styles/utils.module.css";
-import { auth, store } from "../firebase/config";
-import { useState } from "react";
-import { doc, setDoc } from "firebase/firestore";
+import { useAuth } from "../hooks/useAuth";
 
 const name = "Sai Blogger";
 export const siteTitle = "Next.js Sample Website";
@@ -23,69 +14,12 @@ export default function Layout({
 	children: React.ReactNode;
 	home?: boolean;
 }) {
-	const [activeUser, setActiveUser] = useState(null);
-	const [isLoading, setIsLoading] = useState(true);
-
-	const signInWithGoogle = async () => {
-		setIsLoading(true);
-		try {
-			const provider = new GoogleAuthProvider();
-			const result = await signInWithPopup(auth, provider);
-			// This gives you a Google Access Token. You can use it to access the Google API.
-			const credential = GoogleAuthProvider.credentialFromResult(result);
-			const token = credential.accessToken;
-			// The signed-in user info.
-			const user = result.user;
-			// ...
-			await setDoc(doc(store, "users", user.uid), {
-				name: user.displayName,
-				email: user.email,
-				uid: user.uid,
-				photoURL: user.photoURL,
-				lastSignInTime: user.metadata.lastSignInTime,
-			});
-			console.log({ token, user, credential });
-		} catch (error) {
-			// Handle Errors here.
-			const errorCode = error.code;
-			const errorMessage = error.message;
-			// The email of the user's account used.
-			const email = error.email;
-			// The AuthCredential type that was used.
-			const credential = GoogleAuthProvider.credentialFromError(error);
-			console.log({ errorCode, errorMessage, email, credential });
-			// ...
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-	const signOutUser = async () => {
-		setIsLoading(true);
-		try {
-			await signOut(auth);
-			console.log("signed out!");
-		} catch (error) {
-			console.log("error signed oout!", { error });
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-	onAuthStateChanged(auth, (user) => {
-		if (user) {
-			// User is signed in, see docs for a list of available properties
-			// https://firebase.google.com/docs/reference/js/firebase.User
-			const uid = user.uid;
-			// ...
-			setActiveUser(user.providerData[0]);
-		} else {
-			// User is signed out
-			// ...
-			setActiveUser(null);
-		}
-		setIsLoading(false);
-	});
+	const {
+		activeUser,
+		loading: authLoading,
+		signOutUser,
+		signInWithGoogle,
+	} = useAuth();
 
 	return (
 		<div className={styles.container}>
@@ -140,14 +74,14 @@ export default function Layout({
 						</h2>
 					</>
 				)}
-				{isLoading ? (
-					<div>Loading....</div>
-				) : !!activeUser?.uid ? (
-					<>
-						<button onClick={signOutUser}>Sign Out</button>
-					</>
+				{!!activeUser?.uid ? (
+					<button onClick={signOutUser}>
+						{authLoading ? "Signing out..." : "Sign Out"}
+					</button>
 				) : (
-					<button onClick={signInWithGoogle}>Sign In</button>
+					<button onClick={signInWithGoogle}>
+						{authLoading ? "Signing in..." : "Sign In"}
+					</button>
 				)}
 			</header>
 			<main>{children}</main>
