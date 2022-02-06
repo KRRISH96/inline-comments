@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, updateDoc } from 'firebase/firestore'
 import { store } from '../firebase/config'
 
 export async function getAllPosts() {  
@@ -34,4 +34,22 @@ export async function getPostComments(postId) {
   console.log(allComments);
 
   return allComments;
+}
+
+export async function updatePost(postId) {
+	const res = await updateDoc(doc(store, "posts", postId), {
+		contentHtml: document.getElementById("content").innerHTML,
+	});
+	console.log(res);
+}
+
+export function attachComments(comments) {
+	const comms = JSON.parse(comments);
+	return comms.map((com) => {
+		const node = document.getElementById(com.nodeId);
+		if (node) {
+			const rect = node.getBoundingClientRect();
+			return { ...com, rect: { ...rect, top: window.scrollY + rect.top } };
+		}
+	});
 }

@@ -1,10 +1,10 @@
+import { GetServerSideProps } from 'next'
 import Head from 'next/head'
-import Layout, { siteTitle } from '../components/layout'
-import utilStyles from '../styles/utils.module.css'
-import { getAllPosts } from '../lib/posts'
 import Link from 'next/link'
+import { getAllPosts } from '../lib/posts'
+import Layout, { siteTitle } from '../components/layout'
 import Date from '../components/date'
-import { GetServerSideProps, GetStaticProps } from 'next'
+import utilStyles from '../styles/utils.module.css'
 
 
 export default function Home({

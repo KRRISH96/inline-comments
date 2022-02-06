@@ -1,18 +1,17 @@
-import Layout from "../../components/layout";
-import { getPost, getPostComments } from "../../lib/posts";
+import { useEffect, useState } from "react";
 import Head from "next/head";
-import Date from "../../components/date";
-import utilStyles from "../../styles/utils.module.css";
 import {
-	addDoc,
+  addDoc,
 	collection,
 	doc,
 	Timestamp,
-	updateDoc,
 } from "firebase/firestore";
-import { auth, store } from "../../firebase/config";
-import { useEffect, useState } from "react";
+import { store } from "../../firebase/config";
 import { useAuth } from "../../hooks/useAuth";
+import { attachComments, getPost, getPostComments, updatePost } from "../../lib/posts";
+import Layout from "../../components/layout";
+import Date from "../../components/date";
+import utilStyles from "../../styles/utils.module.css";
 
 type Comment = {
 	text: string;
@@ -26,24 +25,6 @@ const RESET_COMMENT = {
 	nodeId: "",
 	text: "",
 };
-
-async function updatePost(postId) {
-	const res = await updateDoc(doc(store, "posts", postId), {
-		contentHtml: document.getElementById("content").innerHTML,
-	});
-	console.log(res);
-}
-
-function attachComments(comments) {
-	const comms = JSON.parse(comments);
-	return comms.map((com) => {
-		const node = document.getElementById(com.nodeId);
-		if (node) {
-			const rect = node.getBoundingClientRect();
-			return { ...com, rect: { ...rect, top: window.scrollY + rect.top } };
-		}
-	});
-}
 
 export default function Post({
 	postData,
@@ -87,7 +68,7 @@ export default function Post({
 		}
 	};
 
-	function highlightSelectionAndInitializeComment(range, sel) {
+	const highlightSelectionAndInitializeComment = (range, sel) => {
 		let selectedContent = range.extractContents();
 		var span = document.createElement("span");
 		span.id = "get-a-random-id-" + Math.random() * 10000;
@@ -180,6 +161,7 @@ export default function Post({
 							style={{ top: scrollYOffset() + showCommentBtnPos.top }}
 						>
 							<textarea
+                autoFocus
 								name="comment"
 								value={commentObj.comment}
 								onChange={({ target }) =>

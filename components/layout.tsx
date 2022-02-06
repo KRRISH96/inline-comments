@@ -1,11 +1,11 @@
 import Head from "next/head";
 import Link from "next/link";
+import { useAuth } from "../hooks/useAuth";
 import styles from "./layout.module.css";
 import utilStyles from "../styles/utils.module.css";
-import { useAuth } from "../hooks/useAuth";
 
-const name = "Sai Blogger";
-export const siteTitle = "Next.js Sample Website";
+const name = "Cutie Puppy";
+export const siteTitle = "Inline Comments POC";
 
 export default function Layout({
 	children,
@@ -27,7 +27,7 @@ export default function Layout({
 				<link rel="icon" href="/favicon.ico" />
 				<meta
 					name="description"
-					content="Learn how to build a personal website using Next.js"
+					content="Medium / Dropbox paper line inline comments"
 				/>
 				<meta
 					property="og:image"

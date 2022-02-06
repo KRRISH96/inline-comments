@@ -64,7 +64,7 @@ aside {
 }
 
 .comment {
-  color: #bada55;
+  color: #14059c;
   padding: 0.25rem 0.5rem;
   width: 10rem;
   border: 1px solid #ccc;
@@ -81,8 +81,8 @@ aside {
   align-self: flex-end;
 }
 
-span > [id^="get-a-random-id-"] {
-  background-color: lightcoral;
+span[id^="get-a-random-id-"], span[id^="get-a-random-id-"] > * {
+  background-color: #bada55;
 }
 
 .highlight-comment-btn, .comment, .comment-form {

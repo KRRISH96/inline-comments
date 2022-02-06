@@ -1,6 +1,6 @@
-import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import { doc, setDoc } from "firebase/firestore";
+import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
 import { auth, store } from "../firebase/config";
 
 export function useAuth() {
