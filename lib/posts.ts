@@ -37,19 +37,19 @@ export async function getPostComments(postId) {
 }
 
 export async function updatePost(postId) {
-	const res = await updateDoc(doc(store, "posts", postId), {
-		contentHtml: document.getElementById("content").innerHTML,
-	});
-	console.log(res);
+  const res = await updateDoc(doc(store, "posts", postId), {
+    contentHtml: document.getElementById("content").innerHTML,
+  });
+  console.log(res);
 }
 
 export function attachComments(comments) {
-	const comms = JSON.parse(comments);
-	return comms.map((com) => {
-		const node = document.getElementById(com.nodeId);
-		if (node) {
-			const rect = node.getBoundingClientRect();
-			return { ...com, rect: { ...rect, top: window.scrollY + rect.top } };
-		}
-	});
+  const comms = JSON.parse(comments);
+  return comms.map((com) => {
+    const node = document.getElementById(com.nodeId);
+    if (node) {
+      const rect = node.getBoundingClientRect();
+      return { ...com, rect: { ...rect, top: window.scrollY + rect.top } };
+    }
+  });
 }
